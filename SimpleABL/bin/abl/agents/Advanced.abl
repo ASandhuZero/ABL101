@@ -1,0 +1,552 @@
+package abl.generated;
+// the package corresponds to where generated Java files are placed.
+
+import abl.wmes.*;
+import abl.actions.*;
+import abl.sensors.*;
+import java.awt.Point;
+// Imports are used the same way as in Java. Its necessary to import Sensor, Action, and WME classes.
+/** 
+ * A simple agent that moves towards the player and occassionally fires bullets.
+ *
+ * @author Josh McCoy 1-23-2019
+ * @author Ben Weber 3-7-11
+ */ 
+behaving_entity Advanced {
+// This defines a name for the agent 
+
+	/** 
+	 * Define the physicals actions that the agent can perform. The definition includes an action prototype and
+	 * and an action class name. The class name must be a Java class which has been imported. 
+	 *
+	 * The prototype parameters correspond to the types expected by the execute(object[]) method 
+	 * in the action's Java class.
+	 */
+	register act moveUp(int) with MoveUp;
+	register act moveDown(int) with MoveDown; 
+	register act moveLeft(int) with MoveLeft;
+	register act moveRight(int) with MoveRight;
+	register act moveTo(int, int, int, int) with MoveTo;
+	register act setTrajectory(int, int, int) with SetTrajectory;
+	register act stop(int) with Stop;
+	register act addBot() with AddBot;
+	register act fire(int, int, int) with Fire;
+	register act changeTrust(int, int) with ChangeTrust;
+	register act setColor(int, int, int, int) with SetColor;
+	register act resetMoves() with ResetMoves;
+	register act resetFired() with ResetFired;
+	register act resetOtherTrajectories(int) with ResetOtherTrajectories;
+	register act resetTrustUpdated() with ResetTrustUpdated;
+	register act startWandering(int) with StartWandering;
+	register act stopWandering(int) with StopWandering;
+	
+	/**
+	 * Define the sensors that add game state to working memory. Each sensor defines the name of the WME class
+	 * that it is responsible for managing and the Java sensor class that implements the functionality. 
+	 */
+    register wme PlayerWME with PlayerSensor;
+    register wme BotWME with BotSensor;
+    register wme BlackBoardWME with BlackBoardSensor;
+
+	/**
+	 * Defines a variable scope to the agent, which can be used and modified in behaviors. 
+	 *
+	 * It is also possible to use constants from a Java interface (e.g.):
+     * constants game.Constants;   
+	 */ 
+	int botSpeed		=   2;
+	int distance		=  15;	//distance to maintain from other bots
+	int playerDistance	=  30;	//distance to maintain from player
+	int trustDecrease	= -10;	//trust lost when shot
+	int trustIncrease	=   2;	//faster gain for trust if near player & not shot at
+	int negTrustFade	=  -1;	//amount to decrease trust when not near player
+	int trustFade		=   1;	//amount to increase trust when not near player
+	int sight			= 150; 
+	int fireThreshold	= -50;	//bot will start shooting back if trust is this low
+	int pointNoReturn	= -80;	//bot will not gain trust again if trust drops below this level
+
+	/**
+	 * Keep track of updates to trust 
+	 */
+	sequential behavior manageTrust() {
+		subgoal Wait(500);
+		subgoal changeTrust();
+	}
+	
+	/**
+	 * Decrease trust when player has been shot
+	 */
+	sequential behavior changeTrust() {
+		precondition { 
+			bWME = (BotWME id::id shot==true trustUpdated==false) //trust > pointNoReturn)
+		}
+		specificity 5;
+		act changeTrust(id, trustDecrease);
+		subgoal changeTrust();
+	}
+	
+	/**
+	 * Increase trust by small amount if near player and not being shot at 
+	 */
+	sequential behavior changeTrust() {
+		precondition { 
+			bWME = (BotWME id::id shot==false trustUpdated==false locationX::botX locationY::botY  trust > pointNoReturn)
+			(PlayerWME locationX::playerX locationY::playerY)	// locationX invokes PlayerMWE.getLocationX() 
+			BBWME = (BlackBoardWME)
+			(sight > BBWME.calcDistance(playerX, playerY, botX, botY))
+		}
+		specificity 4;
+		act changeTrust(id, trustIncrease);
+		subgoal changeTrust();
+	}
+	
+	
+	/**
+	 * Bring trust to neutral when not near player 
+	 */
+	sequential behavior changeTrust() {
+		precondition {
+			bWME = (BotWME id::id shot==false trustUpdated==false trust > pointNoReturn trust < 0)
+		}
+		specificity 3;
+		act changeTrust(id, trustFade);
+		subgoal changeTrust();
+	}
+	
+	/**
+	 * Bring trust to neutral when not near player
+	 */
+	sequential behavior changeTrust() {
+		precondition {
+			bWME = (BotWME id::id shot==false trustUpdated==false trust > 0)
+		}
+		specificity 3;
+		act changeTrust(id, negTrustFade);
+		subgoal changeTrust();
+	}
+
+	
+	sequential behavior changeTrust() {
+		specificity 1;
+		act resetTrustUpdated();
+		succeed_step;	
+	}
+	
+	/**
+	 * After an initial delay, continuously fire bullets. 
+	 */
+	sequential behavior manageFiring() {
+		subgoal Wait(2000);					// this suspends the execution of the behavior
+		with (persistent) subgoal fire();
+	}
+	
+    /**
+     * Fires a bullet at the player character using the bot position at the source and the player position as the target
+     *
+     * Each fire action is followed by a cooldown period. 
+     */
+	sequential behavior fire() {
+		precondition {
+			(PlayerWME locationX::playerX locationY::playerY)	 
+			(BotWME locationX::botX locationY::botY id::id hasFired==false trust::trust)
+			(fireThreshold > trust)
+			BBWME = (BlackBoardWME)
+			(sight > BBWME.calcDistance(playerX, playerY, botX, botY))
+		}
+		specificity 2;
+		//act fire(botX, botY, playerX, playerY);	
+		act fire(playerX, playerY, id);
+		subgoal Wait(500);
+		subgoal fire();
+	}
+
+	sequential behavior fire() {
+		specificity 1;
+	
+		act resetFired();
+		subgoal Wait(500);
+		
+		succeed_step;
+	}
+
+	/**
+	 * Continuously move towards the player character.
+	 */
+	sequential behavior manageMovement() {
+		with (priority 2) subgoal wander();
+		with (priority 1) subgoal moveTo();
+	}
+
+	/**
+	 * move bots in random direction
+	 * sets random direction and starts random movement
+	 */
+	sequential behavior wander() {
+		precondition {
+			bWME = (BotWME id::id moved==false wandering==false locationX::X locationY::Y)
+			(PlayerWME locationX::playerX locationY::playerY)
+			BBWME = (BlackBoardWME)
+			(sight < BBWME.calcDistance(playerX, playerY, X, Y))
+		}
+		specificity 10;
+		
+		act startWandering(id);
+		
+		subgoal wander();
+	}
+
+	/**
+	 * starts wandering behavior when bot's trust has dipped below point of no return 
+	 */
+	sequential behavior wander() {
+		precondition {
+			bWME = (BotWME id::id moved==false wandering==false trust<=pointNoReturn)
+		}
+		specificity 9;
+		
+		act startWandering(id);
+		
+		subgoal wander();
+	}
+	
+	/**
+	 * stops wandering if bot sees player
+	 */
+	sequential behavior wander() {
+		precondition {
+			bWME = (BotWME id::id moved==false wandering==true locationX::X locationY::Y trust > pointNoReturn)
+			(PlayerWME locationX::playerX locationY::playerY)
+			BBWME = (BlackBoardWME)
+			(sight > BBWME.calcDistance(playerX, playerY, X, Y))
+		}
+		specificity 8;
+		
+		act stopWandering(id);
+		
+		subgoal wander();
+	}
+
+	/**
+	 * bot needs a new location to wander to
+	 */
+	 sequential behavior wander() {
+		 precondition {
+			bWME = (BotWME id::id moved==false wandering==true wanderingX::wx wanderingY::wy locationX::X locationY::Y)
+			BBWME = (BlackBoardWME)
+			(botSpeed >= BBWME.calcDistance(wx, wy, X, Y))
+		 }
+		 specificity 7;
+		 
+		 act startWandering(id);
+	
+		 subgoal wander();
+	 }
+	
+	
+	/**
+	 * bot continues to wander without collision 
+	 */
+	sequential behavior wander() {
+		precondition {
+			bWME = (BotWME id::id moved==false wandering==true wanderingX::wx wanderingY::wy locationX::X locationY::Y)
+			(true==bWME.calcPotentialTrajectory(wx, wy))	
+			(BotWME id==id potentialX::px potentialY::py)
+			BBWME = (BlackBoardWME)
+			(false==BBWME.isBotCollision(id, distance, playerDistance, px, py))
+		}
+		specificity 5;
+		
+		act setTrajectory(id, px, py);
+		
+		subgoal wander();
+	}
+	
+	/**
+	 * bot was wandering but needs to reset target location due to collision 
+	 */
+	sequential behavior wander() {
+		precondition {
+			bWME = (BotWME id::id moved==false wandering==true) 
+		}
+		specificity 4;
+		
+		act setTrajectory(id, 0, 0);
+		act startWandering(id);
+	
+		subgoal wander();
+	}
+
+	/**
+	 * base case for wandering
+	 */
+	sequential behavior wander() {
+		specificity 1;
+		succeed_step;
+	}		
+	
+	/**
+	 * Makes all bots move towards the player's current location
+	 * 
+	 * Considers all 8 cardinal directions, and checks for bot collisions
+	 */
+	sequential behavior moveTo() { // no bot collison
+		precondition { 
+			(PlayerWME locationX::playerX locationY::playerY)
+			bWME = (BotWME id::id moved==false) //X::X Y::Y)
+			BBWME = (BlackBoardWME)
+			//(sight > bWME.calcDistance(playerX, playerY, X, Y))
+			(true==bWME.calcPotentialTrajectory(playerX, playerY))	
+			(BotWME id==id potentialX::px potentialY::py)
+			(false==BBWME.isBotCollision(id, distance, playerDistance, px, py))
+		}
+		specificity 10;
+		
+		act setTrajectory(id, px, py);
+		
+		subgoal moveTo();
+	}
+	
+	/**
+	 * Try moving up 
+	 */
+	sequential behavior moveTo() {
+		precondition {
+			(PlayerWME locationY::playerY)
+			bWME = (BotWME locationY::botY id::id moved==false) 
+			(botY > (playerY + botSpeed))
+			BBWME = (BlackBoardWME)
+			(false==BBWME.isBotCollision(id, distance, playerDistance, 0, -botSpeed))
+		}
+		specificity 4;
+		
+		act setTrajectory(id, 0, -2);
+		subgoal moveTo();
+	}
+
+	/**
+	 * Try moving down
+	 */
+	sequential behavior moveTo() {
+		precondition {
+			(PlayerWME locationY::playerY)
+			bWME = (BotWME locationY::botY id::id moved==false) 
+			(botY < (playerY - botSpeed))
+			BBWME = (BlackBoardWME)
+			//(true==bWME.setPotentialTrajectory(0,botSpeed))
+			(false==BBWME.isBotCollision(id, distance, playerDistance, 0, botSpeed))
+		}
+		specificity 4;
+		
+		act setTrajectory(id, 0, botSpeed);
+		subgoal moveTo();
+	}
+	
+	/**
+	 * Try moving left
+	 */
+	sequential behavior moveTo() {
+		precondition {
+			(PlayerWME locationX::playerX)
+			bWME = (BotWME locationX::botX id::id moved==false) 
+			(botX > (playerX + botSpeed))
+			BBWME = (BlackBoardWME)
+			//(true==bWME.setPotentialTrajectory(-botSpeed,0))
+			(false==BBWME.isBotCollision(id, distance, playerDistance, -botSpeed, 0))
+		}
+		specificity 4;
+		
+		act setTrajectory(id, -2, 0);
+		subgoal moveTo();
+	}
+	
+	/**
+	 * Try moving right
+	 */
+	sequential behavior moveTo() {
+		precondition {
+			(PlayerWME locationX::playerX)
+			bWME = (BotWME locationX::botX id::id moved==false) 
+			(botX < (playerX - botSpeed))
+			BBWME = (BlackBoardWME)
+			//(true==bWME.setPotentialTrajectory(botSpeed,0))
+			(false==BBWME.isBotCollision(id, distance, playerDistance, botSpeed, 0))
+		}
+		specificity 4;
+	
+		act setTrajectory(id, botSpeed, 0);
+		subgoal moveTo();
+	}
+
+	/**
+	 * Error edge case: due to game engine. 
+	 */
+	sequential behavior moveTo() {
+		precondition {
+			bWME = (BotWME locationX::botX id::id moved==false) 
+			BBWME = (BlackBoardWME)
+			(true==BBWME.isPermanentBotCollision(id, distance))
+			(BotWME id==id potentialX::x potentialY::y)
+		}
+		specificity 3;
+	
+		mental_act {
+			System.out.println("IMM STUUUCCKKKKKK");
+			//x = 2*x;
+			//y = 2*y;
+		}
+		
+		/*
+		act setTrajectory(id, x, y);
+		act resetMoves();
+		act resetOtherTrajectories(id);
+		*/
+		//act resetMoves();
+		act setTrajectory(id, 0, 0);
+		//act setTrajectory(id, x, y);
+		//subgoal moveTo();
+	}	
+	
+	sequential behavior moveTo() {
+		precondition { 
+			bWME = (BotWME id::id moved==false)
+		}
+		specificity 2;
+		
+		act setTrajectory(id, 0, 0);
+		subgoal moveTo();
+	}
+	
+	/**
+	 * Makes all bots move towards the player's current location
+	 * Will only drop into this instance of MoveTo after all bots have
+	 * gotten a chance to move. So, we reset the variable that marks whether
+	 * they have taken their "turn"
+	 */
+	sequential behavior moveTo() {
+		specificity 1;
+		act resetMoves();
+		succeed_step;
+	}		
+	
+	
+			
+	sequential behavior changeTrust() {
+		precondition { 
+			bWME = (BotWME id::id moved==false)
+			BBWME = (BlackBoardWME)
+			(BBWME.isBulletCollision(id))
+		}
+		specificity 3;
+
+		
+		act changeTrust(id, -10);
+	}
+	
+	/**
+	 * Moves the bot up if the player is above the bot.
+	 * 
+	 * Note: The agent prefers vertical over horizonal movement, because the move up and move down behaviors have 
+	 * a higher specificity than the other move behaviors. Therefore, if the agent needs to be moved up or down,
+	 * they are chosen first. 
+	 */ 
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationY::playerY)
+			(BotWME locationY::botY id::id) 
+			(botY > (playerY + botSpeed))
+		}
+		specificity 3;
+ 
+		act moveUp(id);
+	}
+ 	
+	/**
+	 * Moves the bot down if the player is below the bot.
+	 */
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationY::playerY)
+			(BotWME locationY::botY id::id) 
+			(botY < (playerY - botSpeed))
+		}
+		specificity 3;
+
+		act moveDown(id);
+	}
+ 	 
+	/**
+	 * Moves the bot left if the player to the left of the bot.
+	 */
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationX::playerX)
+			(BotWME locationX::botX id::id) 
+			(botX > (playerX + botSpeed))
+		}
+		specificity 2;
+
+		act moveLeft(id);
+	}
+
+	/**
+	 * Moves the bot right if the player to the right of the bot.
+	 */
+	sequential behavior move() {
+		precondition { 
+			(PlayerWME locationX::playerX)
+			(BotWME locationX::botX id::id) 
+			(botX < (playerX - botSpeed))
+		}
+		specificity 2;
+
+		act moveRight(id);
+	}
+	
+	/**
+	 * Stops the bot.
+	 *
+	 * Of the move behaviors, this is always evaluated last due to having the lowest specificity. 
+	 * Since it is evaluated last, it is only reached if none of the other behaviors can be activited,
+	 * which means the player and bot are overlapping. This is why there are no preconditions. 
+	 */
+	sequential behavior move() {
+		precondition {
+			(BotWME id::id)
+		}
+		specificity 1;
+		act stop(id);
+	}
+
+    /**
+     * Utility behavior for suspending the execution of a behavior.
+     *
+     * This behavior consist of two steps. First, the mental act compute the finishing time
+     * based on the input delay. Second, the success tests waits until the condition check
+     * evaluates to true.
+     */
+	sequential behavior Wait(int milliseconds) {
+		long finish;
+	    mental_act { 
+	    	finish = System.currentTimeMillis() + milliseconds; 
+	    }
+	    
+	    with ( success_test { (System.currentTimeMillis() > finish) } ) wait;
+	}
+ 
+    /** 
+     * Root of the active behavior tree.
+     *
+     * Note: this is a parallel behavior.
+     * Note: the ABL compiler expects this to be the last behavior defined in the agent. 
+     * Note: priorities are used to ensure all goals are pursued, since the move() goal can thrash in this simple example
+     */
+    initial_tree {
+    	with (priority 6) mental_act {
+			System.out.println("Starting bot Agent");
+    	}
+     	
+    	with (priority 5) subgoal manageFiring();
+    	with (priority 4, persistent) subgoal manageTrust();
+    	with (priority 1, persistent) subgoal manageMovement();
+    }
+}
