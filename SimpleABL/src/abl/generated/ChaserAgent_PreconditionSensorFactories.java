@@ -15,7 +15,7 @@ import abl.sensors.*;
 public class ChaserAgent_PreconditionSensorFactories {
    static public SensorActivation[] preconditionSensorFactory0(int __$behaviorID) {
       switch (__$behaviorID) {
-         case 1: {
+         case 2: {
                SensorActivation[] __$activationArray = {
                   new SensorActivation(new BotSensor(), null)
                };
@@ -23,7 +23,7 @@ public class ChaserAgent_PreconditionSensorFactories {
                return __$activationArray;
 
          }
-         case 3: {
+         case 4: {
                SensorActivation[] __$activationArray = {
                   new SensorActivation(new PlayerSensor(), null),
                   new SensorActivation(new BotSensor(), null)
@@ -33,6 +33,33 @@ public class ChaserAgent_PreconditionSensorFactories {
 
          }
          case 5: {
+               SensorActivation[] __$activationArray = {
+                  new SensorActivation(new PlayerSensor(), null),
+                  new SensorActivation(new BotSensor(), null)
+               };
+
+               return __$activationArray;
+
+         }
+         case 6: {
+               SensorActivation[] __$activationArray = {
+                  new SensorActivation(new PlayerSensor(), null),
+                  new SensorActivation(new BotSensor(), null)
+               };
+
+               return __$activationArray;
+
+         }
+         case 7: {
+               SensorActivation[] __$activationArray = {
+                  new SensorActivation(new PlayerSensor(), null),
+                  new SensorActivation(new BotSensor(), null)
+               };
+
+               return __$activationArray;
+
+         }
+         case 8: {
                SensorActivation[] __$activationArray = {
                   new SensorActivation(new PlayerSensor(), null),
                   new SensorActivation(new BotSensor(), null)

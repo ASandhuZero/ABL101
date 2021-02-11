@@ -18,51 +18,66 @@ public class ChaserAgent_Analysis {
          case 0: {
             // WaitAndChangeColor_1
             List<String> _$analysisStepIDs = new ArrayList<String>();
-            _$analysisStepIDs.add("manageMovement()"); // stepID 1
-            _$analysisStepIDs.add("ChangeColor()"); // stepID 2
+            _$analysisStepIDs.add("manageMovement()"); // stepID 0
+            _$analysisStepIDs.add("ChangeColor()"); // stepID 1
             return _$analysisStepIDs;
          }
          case 1: {
-            // ChangeColor_1
+            // Test_1
             List<String> _$analysisStepIDs = new ArrayList<String>();
+            _$analysisStepIDs.add("manageMovement()"); // stepID 3
             return _$analysisStepIDs;
          }
          case 2: {
-            // manageFiring_1
+            // ChangeColor_1
             List<String> _$analysisStepIDs = new ArrayList<String>();
             _$analysisStepIDs.add("Wait(int)"); // stepID 4
-            _$analysisStepIDs.add("fire()"); // stepID 5
+            _$analysisStepIDs.add("ChangeColor()"); // stepID 6
             return _$analysisStepIDs;
          }
          case 3: {
-            // fire_1
+            // manageMovement_1
             List<String> _$analysisStepIDs = new ArrayList<String>();
-            _$analysisStepIDs.add("Wait(int)"); // stepID 8
+            _$analysisStepIDs.add("move()"); // stepID 7
             return _$analysisStepIDs;
          }
          case 4: {
-            // manageMovement_1
+            // move_1
             List<String> _$analysisStepIDs = new ArrayList<String>();
-            _$analysisStepIDs.add("moveTo()"); // stepID 9
             return _$analysisStepIDs;
          }
          case 5: {
-            // moveTo_1
+            // move_2
             List<String> _$analysisStepIDs = new ArrayList<String>();
             return _$analysisStepIDs;
          }
          case 6: {
-            // Wait_1
+            // move_3
             List<String> _$analysisStepIDs = new ArrayList<String>();
             return _$analysisStepIDs;
          }
          case 7: {
-            // ChaserAgent_RootCollectionBehavior
+            // move_4
             List<String> _$analysisStepIDs = new ArrayList<String>();
-            _$analysisStepIDs.add("WaitAndChangeColor()"); // stepID 14
             return _$analysisStepIDs;
          }
          case 8: {
+            // move_5
+            List<String> _$analysisStepIDs = new ArrayList<String>();
+            return _$analysisStepIDs;
+         }
+         case 9: {
+            // Wait_1
+            List<String> _$analysisStepIDs = new ArrayList<String>();
+            return _$analysisStepIDs;
+         }
+         case 10: {
+            // ChaserAgent_RootCollectionBehavior
+            List<String> _$analysisStepIDs = new ArrayList<String>();
+            _$analysisStepIDs.add("WaitAndChangeColor()"); // stepID 16
+            return _$analysisStepIDs;
+         }
+         case 11: {
             // __$defaultMemoryExecuteBehavior_1
             List<String> _$analysisStepIDs = new ArrayList<String>();
             return _$analysisStepIDs;

@@ -30,63 +30,71 @@ public class ChaserAgent_StepFactories {
          }
          case 0: {
             // WaitAndChangeColor_1Step1
-            return new MentalStep(0, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)3, (short)0, false, null, ChaserAgent.__$mentalExecute0_rfield, null, null, null);
+            return new GoalStep(0, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)1, (short)0, false, null, null, null, null, null, "manageMovement()", null, (short)0);
          }
          case 1: {
             // WaitAndChangeColor_1Step2
-            return new GoalStep(1, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, null, null, null, null, "manageMovement()", null, (short)0);
+            return new GoalStep(1, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)2, (short)0, false, null, null, null, null, null, "ChangeColor()", null, (short)0);
          }
          case 2: {
-            // WaitAndChangeColor_1Step3
-            return new GoalStep(2, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, null, null, null, null, "ChangeColor()", null, (short)0);
+            // Test_1Step1
+            return new MentalStep(2, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)3, (short)0, false, null, ChaserAgent.__$mentalExecute0_rfield, null, null, null);
          }
          case 3: {
-            // ChangeColor_1Step1
-            return new PrimitiveStep(3, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new SetColor(), null, "setColor");
+            // Test_1Step2
+            return new GoalStep(3, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, null, null, null, null, "manageMovement()", null, (short)0);
          }
          case 4: {
-            // manageFiring_1Step1
+            // ChangeColor_1Step1
             return new GoalStep(4, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, "Wait(int)", null, (short)0);
          }
          case 5: {
-            // manageFiring_1Step2
-            return new GoalStep(5, __$stepFactory, __$behaviorParent, true, false, false, false, false, false, (short)-32768, (short)0, false, null, null, null, null, null, "fire()", null, (short)0);
+            // ChangeColor_1Step2
+            return new PrimitiveStep(5, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new SetColor(), null, "setColor");
          }
          case 6: {
-            // fire_1Step1
-            return new PrimitiveStep(6, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new SetColor(), null, "setColor");
+            // ChangeColor_1Step3
+            return new GoalStep(6, __$stepFactory, __$behaviorParent, true, false, false, false, false, false, (short)-32768, (short)0, false, null, null, null, null, null, "ChangeColor()", null, (short)0);
          }
          case 7: {
-            // fire_1Step2
-            return new PrimitiveStep(7, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new Fire(), null, "fire");
+            // manageMovement_1Step1
+            return new GoalStep(7, __$stepFactory, __$behaviorParent, true, false, false, false, false, false, (short)-32768, (short)0, false, null, null, null, null, null, "move()", null, (short)0);
          }
          case 8: {
-            // fire_1Step3
-            return new GoalStep(8, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, "Wait(int)", null, (short)0);
+            // move_1Step1
+            return new PrimitiveStep(8, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new MoveUp(), null, "moveUp");
          }
          case 9: {
-            // manageMovement_1Step1
-            return new GoalStep(9, __$stepFactory, __$behaviorParent, true, false, false, false, false, false, (short)-32768, (short)0, false, null, null, null, null, null, "moveTo()", null, (short)0);
+            // move_2Step1
+            return new PrimitiveStep(9, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new MoveDown(), null, "moveDown");
          }
          case 10: {
-            // moveTo_1Step1
-            return new PrimitiveStep(10, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new MoveTo(), null, "moveTo");
+            // move_3Step1
+            return new PrimitiveStep(10, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new MoveLeft(), null, "moveLeft");
          }
          case 11: {
-            // Wait_1Step1
-            return new MentalStep(11, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$mentalExecute0_rfield, null, null, null);
+            // move_4Step1
+            return new PrimitiveStep(11, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new MoveRight(), null, "moveRight");
          }
          case 12: {
-            // Wait_1Step2
-            return new WaitStep(12, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, null, ChaserAgent.__$successTest0_rfield, null, null);
+            // move_5Step1
+            return new PrimitiveStep(12, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$argumentExecute0_rfield, null, null, null, new Stop(), null, "stop");
          }
          case 13: {
-            // ChaserAgent_RootCollectionBehaviorStep1
-            return new MentalStep(13, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)3, (short)0, false, null, ChaserAgent.__$mentalExecute0_rfield, null, null, null);
+            // Wait_1Step1
+            return new MentalStep(13, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, ChaserAgent.__$mentalExecute0_rfield, null, null, null);
          }
          case 14: {
+            // Wait_1Step2
+            return new WaitStep(14, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)-32768, (short)0, false, null, null, ChaserAgent.__$successTest0_rfield, null, null);
+         }
+         case 15: {
+            // ChaserAgent_RootCollectionBehaviorStep1
+            return new MentalStep(15, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)3, (short)0, false, null, ChaserAgent.__$mentalExecute0_rfield, null, null, null);
+         }
+         case 16: {
             // ChaserAgent_RootCollectionBehaviorStep2
-            return new GoalStep(14, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)1, (short)0, false, null, null, null, null, null, "WaitAndChangeColor()", null, (short)0);
+            return new GoalStep(16, __$stepFactory, __$behaviorParent, false, false, false, false, false, false, (short)1, (short)0, false, null, null, null, null, null, "WaitAndChangeColor()", null, (short)0);
          }
       default:
          throw new AblRuntimeError("Unexpected stepID " + __$stepID);
