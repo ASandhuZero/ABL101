@@ -1,7 +1,7 @@
 # ABL101
 This is a modified Demo based off of Ben Weber's Getting Start with ABL [tutorial](https://eis-blog.soe.ucsc.edu/2012/02/getting-started-with-abl/).
 # HOW TO RUN
-1. Download Ecilps 
+1. Download Ecilpse
 2. To open the project, go File > Open Project and open this folder.
   - This should import the SimpleABL project and set it as a Java Application.
 3. At this point go to abl/build within the file explorer. 
