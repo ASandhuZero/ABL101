@@ -10,19 +10,19 @@ Next, open Eclispe and within the drop down menus, choose "File" and choose "Ope
 Find and open the SimpleABL folder (which is nested in this repo) in Eclipse through the Open Project prompt. 
 
 At this point the Eclipse file explorer should look something like this 
-![](2023-02-01-20-07-38.png)
+![](images/2023-02-01-20-07-38.png)
 
 Select the AgentCompiler.java and run this file as a java application
-![](2023-02-01-20-08-46.png)
+![](images/2023-02-01-20-08-46.png)
 
 This should build the Starter.abl agent. If there is an error then email the TA.
 
 Now, run the gameEnigine.java as a Java Application
-![](2023-02-01-20-10-14.png)
+![](images/2023-02-01-20-10-14.png)
 
 A new application box should appear, similar to the application image shown below
 
-![](2023-02-01-20-10-53.png)
+![](images/2023-02-01-20-10-53.png)
 
 If this point has been reachehd, then congratulations, ABL development can now begin.
 
